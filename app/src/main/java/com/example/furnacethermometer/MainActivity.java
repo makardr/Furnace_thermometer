@@ -2,6 +2,8 @@ package com.example.furnacethermometer;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -10,36 +12,56 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
+
     private static final String TAG = "ThermometerMainActivity";
+
+    //    Flags
+    private Boolean taskStartedFlag = false;
+
+    //    Interface elements
     private TextView textViewDisplay;
-    private Handler mainHandler = new Handler();
-    private RunnableTask runnableTask;
+    private Button startButton;
 
 
+    //    Background tasks
+    private RefreshTemperatureRunnableTask refreshTemperatureRunnableTask;
+    final Handler mainHandler = new Handler();
+    final HandlerThread backgroundHandlerThread = new HandlerThread("HandlerThreadName");
+    private Handler backgroundHandler;
+
+
+    //    Lifecycle
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "Application created");
-        this.textViewDisplay = (TextView) findViewById(R.id.textViewDisplay);
 
+
+//        Initialize background handler
+        backgroundHandler = createBackgroundHandler();
 
 //        Initialize runnable task
-        this.runnableTask = new RunnableTask(textViewDisplay);
+        this.refreshTemperatureRunnableTask = new RefreshTemperatureRunnableTask(backgroundHandler);
+
+
+//        Initialize interface components in code
+        this.textViewDisplay = (TextView) findViewById(R.id.textViewDisplay);
+        this.startButton = (Button) findViewById(R.id.startBtn);
 
 //        Example how to bind onClick from the code
-        Button startHandlerTaskButton = (Button) findViewById(R.id.testBtn);
-        startHandlerTaskButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                changeTV(textViewDisplay,"test");
-                try {
-                    startHandlerTask();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+//        Button startHandlerTaskButton = (Button) findViewById(R.id.startBtn);
+//        startHandlerTaskButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+////                changeTV(textViewDisplay,"test");
+//                try {
+//                    startHandlerTask();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
 
     }
 
@@ -74,41 +96,66 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void startHandlerTask() throws InterruptedException {
-
-//        Runnable task = new Runnable() {
-//            int timesRun = 0;
-//            public void run() {
-//                String msg = "Times handler run: "+timesRun+". Running in thread "+ Thread.currentThread().getId();
-//                changeTV(textViewDisplay,msg);
-//                timesRun+=1;
-//                Log.d(TAG, msg);
-//                mainHandler.postDelayed(this, 3000); // Repeat every 3 seconds
-//            }
-//        };
-        Log.e(TAG, "Current thread is: "+Thread.currentThread().getId());
-        mainHandler.post(runnableTask);
+    //    Interface
+    public static void changeTV(TextView tv, String text) {
+        tv.setText(text);
     }
 
+//    Interface buttons
 
-    public void startThread(View view) {
-        for (int i = 0; i < 10; i++) {
+    public void startBtnAction(View view) {
+        if (!taskStartedFlag) {
             try {
-                Thread.sleep(1000);
+                refreshTemperatureRunnableTask.setStartThread();
+                startHandlerTask();
+                taskStartedFlag = true;
+                startButton.setText("Stop");
+                Log.i(TAG, "startBtnAction: Background task started");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
+        } else {
+            taskStartedFlag = false;
+            startButton.setText("Start");
+            refreshTemperatureRunnableTask.setStopThread();
+            Log.i(TAG, "startBtnAction: Background task stopped");
         }
+
     }
 
-    public void stopThread(View view) {
-//        TextView textViewDisplay=(TextView)findViewById(R.id.textViewDisplay);
-//        textViewDisplay.setText("test");
-        runnableTask.setStopThread();
+
+
+
+//    Handlers, background, technical stuff
+
+    public void startHandlerTask() throws InterruptedException {
+//        Start updating temperature value
+        backgroundHandler.post(refreshTemperatureRunnableTask);
+//        Start updating interface
+        mainHandler.post(interfaceUpdateTask());
     }
 
-    public static void changeTV(TextView tv, String text) {
-        tv.setText(text);
+
+    public Handler createBackgroundHandler() {
+//        Start handler thread
+        backgroundHandlerThread.start();
+
+        return new Handler(backgroundHandlerThread.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                // Process received messages here!
+            }
+        };
+    }
+
+
+    public Runnable interfaceUpdateTask() {
+        Runnable task = new Runnable() {
+            public void run() {
+                changeTV(textViewDisplay, refreshTemperatureRunnableTask.getCurrentTemperature());
+                mainHandler.postDelayed(this, 1000); // Repeat every 1 second
+            }
+        };
+        return task;
     }
 }
