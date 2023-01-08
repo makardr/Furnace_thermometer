@@ -1,8 +1,7 @@
-package com.example.furnacethermometer;
+package com.example.furnacethermometer.lib;
 
 import android.os.Handler;
 import android.util.Log;
-import android.widget.TextView;
 
 
 //  This class is runnable that was separated into its own class to better separate all the background things connected to the
@@ -12,14 +11,13 @@ public class RefreshTemperatureRunnableTask implements Runnable {
     private static final String TAG = "RefreshTemperatureTask";
     Handler backgroundHandler;
     volatile boolean stopThread;
-    String currentTemperature="0";
+    String currentTemperature = "0";
     GetThermometerValue thermometerValue;
 
-    RefreshTemperatureRunnableTask(Handler backgroundHandler) {
+    public RefreshTemperatureRunnableTask(Handler backgroundHandler, String ipAddress) {
         this.backgroundHandler = backgroundHandler;
         this.stopThread = false;
-
-        thermometerValue = new GetThermometerValue("http://192.168.0.120/");
+        this.thermometerValue = new GetThermometerValue(ipAddress);
     }
 
     @Override
@@ -34,17 +32,19 @@ public class RefreshTemperatureRunnableTask implements Runnable {
 
     public void backgroundTask() {
         String response = thermometerValue.readStringHtml();
-        Log.i(TAG, "Response thermometer value is " + response);
-        currentTemperature=response;
+        Log.d(TAG, "Thread " + Thread.currentThread().getId() + " background task executed, result is " + response);
+        currentTemperature = response;
     }
 
-    public void setStopThread(){
-        stopThread=true;
+    public void setStopThread() {
+        stopThread = true;
     }
-    public void setStartThread(){
-        stopThread=false;
+
+    public void setStartThread() {
+        stopThread = false;
     }
-    public String getCurrentTemperature(){
+
+    public String getCurrentTemperature() {
         return currentTemperature;
     }
 

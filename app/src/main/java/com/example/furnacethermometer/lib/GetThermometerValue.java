@@ -1,4 +1,4 @@
-package com.example.furnacethermometer;
+package com.example.furnacethermometer.lib;
 
 import android.util.Log;
 
@@ -22,13 +22,11 @@ public class GetThermometerValue{
             Document document = Jsoup.parse(html);
             Element link = document.select("p").first();
             String strNumber = link.text().split(" ")[0];
-            Log.i(TAG, "Current thread is" + Thread.currentThread());
-            Log.i(TAG, "Result is " + Integer.parseInt(strNumber));
+//            Log.i(TAG, "Thread: " + Thread.currentThread().getId() + " Result: " + Integer.parseInt(strNumber));
             return strNumber;
 
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
-            Log.e(TAG, "Current thread is: "+Thread.currentThread().getId());
             return null;
         }
 
