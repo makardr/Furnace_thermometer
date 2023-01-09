@@ -30,6 +30,7 @@ public class UpdateNotificationRunnable implements Runnable {
 
         Log.i(TAG, "notificationUpdateTask: Notification sent");
         checkTemperatureForNotification(temperatureRefreshClass.getCurrentTemperature());
+//        MainActivity.staticCreateNotification("Температура", "Температура печки больше " + 65 + " градусов", 2222, "alert_temperature_notification", mainActivity,2);
         mainHandler.postDelayed(this, 10000); // Repeat every 10 seconds
     }
 

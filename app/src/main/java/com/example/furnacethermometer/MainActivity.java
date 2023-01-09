@@ -2,6 +2,9 @@ package com.example.furnacethermometer;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -222,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Thermometer alerts";
             String description = "alerts for temperature in the furnace";
-            int importance = NotificationManager.IMPORTANCE_LOW;
+            int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(ALERT_NOTIFICATION_CHANNEL_ID, name, importance);
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance
@@ -233,30 +236,55 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void createNotification(String textTitle, String textContent, int notificationId,String NOTIFICATION_CHANNEL_ID,int priority) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle(textTitle)
-                .setContentText(textContent)
-                .setPriority(priority);
+        if (priority==2) {
+            Uri alertSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                    .setContentTitle(textTitle)
+                    .setContentText(textContent)
+                    .setSound(alertSound)
+                    .setPriority(priority);
 //                .setPriority(NotificationCompat.PRIORITY_LOW);
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
 // notificationId is a unique int for each notification that you must define
-        notificationManager.notify(notificationId, builder.build());
+            notificationManager.notify(notificationId, builder.build());
+        }else {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                    .setContentTitle(textTitle)
+                    .setContentText(textContent)
+                    .setPriority(priority);
+//                .setPriority(NotificationCompat.PRIORITY_LOW);
+
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+// notificationId is a unique int for each notification that you must define
+            notificationManager.notify(notificationId, builder.build());
+        }
     }
 
     public static void staticCreateNotification(String textTitle, String textContent, int notificationId, String NOTIFICATION_CHANNEL_ID, MainActivity activity,int priority) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(activity, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle(textTitle)
-                .setContentText(textContent)
-                .setPriority(priority);
-//                .setPriority(NotificationCompat.PRIORITY_HIGH);
-//        PRIORITY_HIGH=1
-//        PRIORITY_LOW=-1
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(activity);
-// notificationId is a unique int for each notification that you must define
-        notificationManager.notify(notificationId, builder.build());
+        if (priority==2) {
+            Uri alertSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(activity, NOTIFICATION_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                    .setContentTitle(textTitle)
+                    .setContentText(textContent)
+                    .setSound(alertSound)
+                    .setPriority(priority);
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(activity);
+            // notificationId is a unique int for each notification that you must define
+            notificationManager.notify(notificationId, builder.build());
+        } else {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(activity, NOTIFICATION_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                    .setContentTitle(textTitle)
+                    .setContentText(textContent)
+                    .setPriority(priority);
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(activity);
+            // notificationId is a unique int for each notification that you must define
+            notificationManager.notify(notificationId, builder.build());
+        }
     }
 
 }
