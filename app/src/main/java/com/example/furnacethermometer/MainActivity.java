@@ -2,6 +2,7 @@ package com.example.furnacethermometer;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -141,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 //    Interface buttons
-
     public void startBtnAction(View view) {
         if (!taskStartedFlag) {
             try {
@@ -163,7 +163,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void settingsBtnAction(View view) {
+        taskStartedFlag = false;
+        startButton.setText("Start");
+        refreshTemperatureRunnableTask.setStopThread();
+        stopHandlerTasks();
 
+//        Open settings activity
+        Intent intent = new Intent(this,SettingsActivity.class);
+        startActivity(intent);
     }
 
 
