@@ -12,7 +12,7 @@ public class UpdateNotificationRunnable implements Runnable {
     Handler mainHandler;
     RefreshTemperatureRunnableTask temperatureRefreshClass;
     MainActivity mainActivity;
-
+    private boolean messageSend = false;
     public UpdateNotificationRunnable(Handler mainHandler, RefreshTemperatureRunnableTask refreshTemperatureRunnableTask, MainActivity mainActivity) {
         this.mainHandler = mainHandler;
         this.temperatureRefreshClass = refreshTemperatureRunnableTask;
@@ -26,8 +26,10 @@ public class UpdateNotificationRunnable implements Runnable {
             Log.d(TAG, "Thread " + Thread.currentThread().getId() + " stopped");
             return;
         }
-        MainActivity.staticCreateNotification("Температура", "Температура печки  " + temperatureRefreshClass.getCurrentTemperature() + " градусов", 1212, "temperature_notification", mainActivity);
+        MainActivity.staticCreateNotification("Температура", "Температура печки " + temperatureRefreshClass.getCurrentTemperature() + " градусов", 1212, "temperature_notification", mainActivity,-1);
+
         Log.i(TAG, "notificationUpdateTask: Notification sent");
+        checkTemperatureForNotification(temperatureRefreshClass.getCurrentTemperature());
         mainHandler.postDelayed(this, 10000); // Repeat every 10 seconds
     }
 
@@ -38,6 +40,20 @@ public class UpdateNotificationRunnable implements Runnable {
 
     public void setStartThread() {
         stopThread = false;
+    }
+
+    public void checkTemperatureForNotification(String temperature) {
+        int temperatureLimit=65;
+        int temperatureInt=Integer.parseInt(temperature);
+        if (temperatureInt >= temperatureLimit && !messageSend) {
+            messageSend = true;
+            Log.d(TAG, "Notification alert for temperature over 50 degrees should be sent once");
+            MainActivity.staticCreateNotification("Температура", "Температура печки больше " + temperatureLimit + " градусов", 2222, "alert_temperature_notification", mainActivity,2);
+        }
+        if (temperatureInt < temperatureLimit && messageSend) {
+            messageSend = false;
+            Log.d(TAG, "Flag is false, notification should not be sent");
+        }
     }
 
 }

@@ -25,12 +25,12 @@ import com.example.furnacethermometer.lib.UpdateNotificationRunnable;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "ThermometerMainActivity";
-    private static final String NOTIFICATION_CHANNEL_ID = "temperature_notification";
+    private static final String BACKGROUND_NOTIFICATION_CHANNEL_ID = "temperature_notification";
+    private static final String ALERT_NOTIFICATION_CHANNEL_ID = "alert_temperature_notification";
     private String ipAddress = "http://192.168.0.120/";
 
     //    Flags
     private boolean taskStartedFlag = false;
-    private boolean messageSend = false;
 
     //    Interface elements
     private TextView textViewDisplay;
@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
 //        Create channel for non-alert notifications
         createNotificationChannel();
+        createAlertNotificationChannel();
 //        Create channel for alert notifications?
 
 
@@ -126,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d(TAG, "Application destroyed");
         refreshTemperatureRunnableTask.setStopThread();
+        stopHandlerTasks();
+        createNotification("Температура", "Приложение завершило работу", 2222, ALERT_NOTIFICATION_CHANNEL_ID,1);
     }
 
 
@@ -202,10 +205,25 @@ public class MainActivity extends AppCompatActivity {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Thermometer alerts";
+            CharSequence name = "Thermometer background";
             String description = "Notifications for temperature in the furnace";
             int importance = NotificationManager.IMPORTANCE_LOW;
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
+            NotificationChannel channel = new NotificationChannel(BACKGROUND_NOTIFICATION_CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+    private void createAlertNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Thermometer alerts";
+            String description = "alerts for temperature in the furnace";
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel channel = new NotificationChannel(ALERT_NOTIFICATION_CHANNEL_ID, name, importance);
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
@@ -214,39 +232,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void createNotification(String textTitle, String textContent, int notificationId) {
+    public void createNotification(String textTitle, String textContent, int notificationId,String NOTIFICATION_CHANNEL_ID,int priority) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(textTitle)
                 .setContentText(textContent)
-                .setPriority(NotificationCompat.PRIORITY_LOW);
+                .setPriority(priority);
+//                .setPriority(NotificationCompat.PRIORITY_LOW);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-
 // notificationId is a unique int for each notification that you must define
         notificationManager.notify(notificationId, builder.build());
     }
 
-    public static void staticCreateNotification(String textTitle, String textContent, int notificationId, String NOTIFICATION_CHANNEL_ID, MainActivity activity) {
+    public static void staticCreateNotification(String textTitle, String textContent, int notificationId, String NOTIFICATION_CHANNEL_ID, MainActivity activity,int priority) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(activity, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(textTitle)
                 .setContentText(textContent)
-                .setPriority(NotificationCompat.PRIORITY_LOW);
-
+                .setPriority(priority);
+//                .setPriority(NotificationCompat.PRIORITY_HIGH);
+//        PRIORITY_HIGH=1
+//        PRIORITY_LOW=-1
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(activity);
 // notificationId is a unique int for each notification that you must define
         notificationManager.notify(notificationId, builder.build());
     }
 
-    public void checkTemperatureForNotification() {
-        if (Integer.parseInt(refreshTemperatureRunnableTask.getCurrentTemperature()) >= 50 && !messageSend) {
-            messageSend = true;
-            Log.d(TAG, "Notification alert for temperature over 50 degrees should be sent once");
-        }
-        if (Integer.parseInt(refreshTemperatureRunnableTask.getCurrentTemperature()) < 50 && messageSend) {
-            messageSend = false;
-            Log.d(TAG, "Flag is false, notification should not be sent");
-        }
-    }
 }
