@@ -12,11 +12,13 @@ public class UpdateInterfaceRunnable implements Runnable {
     Handler mainHandler;
     RefreshTemperatureRunnableTask temperatureRefreshClass;
     TextView tv;
+    int interfaceRefresh;
 
-    public UpdateInterfaceRunnable(TextView tv, Handler mainHandler, RefreshTemperatureRunnableTask refreshTemperatureRunnableTask) {
+    public UpdateInterfaceRunnable(TextView tv, Handler mainHandler, RefreshTemperatureRunnableTask refreshTemperatureRunnableTask, int interfaceRefresh) {
         this.mainHandler = mainHandler;
         this.temperatureRefreshClass = refreshTemperatureRunnableTask;
         this.tv = tv;
+        this.interfaceRefresh = interfaceRefresh * 1000;
     }
 
 
@@ -26,7 +28,7 @@ public class UpdateInterfaceRunnable implements Runnable {
             return;
         }
         MainActivity.changeTV(tv, temperatureRefreshClass.getCurrentTemperature());
-        mainHandler.postDelayed(this, 1000); // Repeat every 1 second
+        mainHandler.postDelayed(this, interfaceRefresh); // Repeat every 1 second
 
 
     }

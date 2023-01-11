@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">test</string>
+    <string name="ip_address">test</string>
+    <string name="temperature_limit_one">test</string>
+    <string name="temperature_limit_two">test</string>
+    <string name="settings">test</string>
+    <string name="start">test</string>
+    <string name="russian">test</string>
+    <string name="time_to_refresh_interface">test</string>
+    <string name="none">test</string>
+    <string name="english">test</string>
+    <string name="save_changes">test</string>
+    <string name="time_to_refresh_temperature">test</string>
+    <string name="time_to_send_notification">test</string>
+</resources>

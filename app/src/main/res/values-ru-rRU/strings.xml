@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Градусник для печки</string>
+    <string name="ip_address">" IP-адрес"</string>
+    <string name="temperature_limit_two">Температурный предел 2</string>
+    <string name="settings">Настройки</string>
+    <string name="temperature_limit_one">Температурный предел 1</string>
+    <string name="none">None</string>
+    <string name="start">Запуск</string>
+    <string name="time_to_refresh_interface">Время обновления интерфейса</string>
+    <string name="russian">Русский</string>
+    <string name="english">English</string>
+    <string name="save_changes">Сохранить изменения</string>
+    <string name="time_to_refresh_temperature">Время обновления температуры</string>
+    <string name="time_to_send_notification">Время отправки уведомления</string>
+</resources>

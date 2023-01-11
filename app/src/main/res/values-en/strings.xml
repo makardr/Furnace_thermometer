@@ -1,8 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Furnace thermometer</string>
-    <string name="ip_address">Ip address</string>
-    <string name="temperature_limit_one">Limit 1</string>
-    <string name="temperature_limit_two">Limit 2</string>
+    <string name="time_to_send_notification">Time to send notification</string>
+    <string name="ip_address">" IP address"</string>
+    <string name="temperature_limit_one">Temperature limit 1</string>
+    <string name="temperature_limit_two">Temperature limit 2</string>
     <string name="none">None</string>
     <string name="settings">Settings</string>
     <string name="start">Start</string>
@@ -11,5 +13,4 @@
     <string name="english">English</string>
     <string name="save_changes">Save changes</string>
     <string name="time_to_refresh_temperature">Time to refresh temperature</string>
-    <string name="time_to_send_notification">Time to send notification</string>
 </resources>

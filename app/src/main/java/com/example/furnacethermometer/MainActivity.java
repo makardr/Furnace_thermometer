@@ -3,6 +3,7 @@ package com.example.furnacethermometer;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -24,16 +25,39 @@ import com.example.furnacethermometer.lib.RefreshTemperatureRunnableTask;
 import com.example.furnacethermometer.lib.UpdateInterfaceRunnable;
 import com.example.furnacethermometer.lib.UpdateNotificationRunnable;
 
+import java.util.Locale;
+
 
 public class MainActivity extends AppCompatActivity {
-
     private static final String TAG = "ThermometerMainActivity";
     private static final String BACKGROUND_NOTIFICATION_CHANNEL_ID = "temperature_notification";
     private static final String ALERT_NOTIFICATION_CHANNEL_ID = "alert_temperature_notification";
-    private String ipAddress = "http://192.168.0.120/";
+
+    //    Shared preferences finals
+    public static final String SHARED_PREFS = "shared_prefs";
+    public static final String PREFS_CHANGED = "prefs_changed";
+    public static final String LANGUAGE = "language";
+
+    public static final String IP_ADDRESS = "ip_address";
+    public static final String T_LIMIT_ONE = "t_limit_one";
+    public static final String T_LIMIT_TWO = "t_limit_two";
+    public static final String T_REFRESH_TIME = "t_refresh_time";
+    public static final String NOTIF_REFRESH_TIME = "notif_refresh_time";
+    public static final String INTERFACE_REFRESH_TIME = "interface_refresh_time";
+
+    //    Shared preferences variables
+    private String ipAddress;
+    private int tLimitOne;
+    private int tLimitTwo;
+    private int refreshTime;
+    private int notifTime;
+    private int interfaceRefresh;
 
     //    Flags
     private boolean taskStartedFlag = false;
+
+    //    Language
+    String language = Locale.getDefault().getDisplayLanguage();
 
     //    Interface elements
     private TextView textViewDisplay;
@@ -50,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
     private UpdateInterfaceRunnable interfaceUpdateTask;
     private UpdateNotificationRunnable notificationUpdateTask;
 
+    //    SharedPreference
+    private boolean sharedPreferenceChanged = false;
 
     //    Lifecycle
     @Override
@@ -57,20 +83,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "Application created");
-        this.ipAddress = "http://192.168.0.120/";
+//        SharedPreferences
+        loadData();
+
+//        Language
+        Log.d(TAG, "Current language is " + language);
+
 //        Create channel for non-alert notifications
         createNotificationChannel();
 //        Create channel for alert notifications
         createAlertNotificationChannel();
 
+
 //        Initialize background handler
-        backgroundHandler = createBackgroundHandler();
+        this.backgroundHandler = createBackgroundHandler();
 //        Initialize background runnable tasks
-        this.refreshTemperatureRunnableTask = new RefreshTemperatureRunnableTask(backgroundHandler, ipAddress);
-
-
-
-
+        this.refreshTemperatureRunnableTask = new RefreshTemperatureRunnableTask(this.backgroundHandler, this.ipAddress, this.refreshTime);
 
 
 //        Initialize interface components in code
@@ -85,6 +113,8 @@ public class MainActivity extends AppCompatActivity {
                 startButton.setText("Stop");
             }
         }
+
+
     }
 
     //    Save current state of application in case it recreates
@@ -105,6 +135,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        loadData();
+        if (sharedPreferenceChanged) {
+            Log.d(TAG, "onResume: Shared preference changed");
+            saveData();
+        }
         Log.d(TAG, "Application started");
     }
 
@@ -112,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "Application resumed");
+
     }
 
     @Override
@@ -179,30 +215,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-//    Handlers, background, technical stuff
-    public void initializeRunnableTasksUnused(){
-
-        //        Initialize background handler
-        backgroundHandler = createBackgroundHandler();
-        //        Initialize background runnable tasks
-        this.refreshTemperatureRunnableTask = new RefreshTemperatureRunnableTask(backgroundHandler, ipAddress);
-        this.interfaceUpdateTask = new UpdateInterfaceRunnable(textViewDisplay, mainHandler, refreshTemperatureRunnableTask);
-        this.notificationUpdateTask = new UpdateNotificationRunnable(mainHandler, refreshTemperatureRunnableTask, this);
-    }
+    //    Handlers, background, technical stuff
+//    public void initializeRunnableTasksUnused() {
+//
+//        //        Initialize background handler
+//        backgroundHandler = createBackgroundHandler();
+//        //        Initialize background runnable tasks
+//        this.refreshTemperatureRunnableTask = new RefreshTemperatureRunnableTask(backgroundHandler, ipAddress,refreshTime);
+//        this.interfaceUpdateTask = new UpdateInterfaceRunnable(textViewDisplay, mainHandler, refreshTemperatureRunnableTask);
+//        this.notificationUpdateTask = new UpdateNotificationRunnable(mainHandler, refreshTemperatureRunnableTask, this, tLimitOne, tLimitTwo);
+//    }
 
 
     public void startHandlerTasks() throws InterruptedException {
 //        Start updating temperature value
-        backgroundHandler.post(refreshTemperatureRunnableTask);
+        backgroundHandler.post(this.refreshTemperatureRunnableTask);
 //        Start updating interface
-        this.interfaceUpdateTask = new UpdateInterfaceRunnable(textViewDisplay, mainHandler, refreshTemperatureRunnableTask);
-        mainHandler.post(interfaceUpdateTask);
+        this.interfaceUpdateTask = new UpdateInterfaceRunnable(textViewDisplay, this.mainHandler, this.refreshTemperatureRunnableTask, this.interfaceRefresh);
+        this.mainHandler.post(interfaceUpdateTask);
 
 //        Start sending notifications
-        this.notificationUpdateTask = new UpdateNotificationRunnable(mainHandler, refreshTemperatureRunnableTask, this);
-        mainHandler.post(notificationUpdateTask);
-
-
+        this.notificationUpdateTask = new UpdateNotificationRunnable(this.mainHandler, this.refreshTemperatureRunnableTask, this, this.tLimitOne, this.tLimitTwo, this.notifTime);
+        this.mainHandler.post(this.notificationUpdateTask);
 
 
     }
@@ -225,6 +259,29 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
+
+    //    Shared preferences
+    public void loadData() {
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+
+        this.sharedPreferenceChanged = sharedPreferences.getBoolean(PREFS_CHANGED, false);
+
+        this.ipAddress = sharedPreferences.getString(IP_ADDRESS, "http://192.168.0.120/");
+        this.tLimitOne = sharedPreferences.getInt(T_LIMIT_ONE, 55);
+        this.tLimitTwo = sharedPreferences.getInt(T_LIMIT_TWO, 65);
+        this.language = sharedPreferences.getString(LANGUAGE, "en");
+        this.refreshTime = sharedPreferences.getInt(T_REFRESH_TIME, 5);
+        this.notifTime = sharedPreferences.getInt(NOTIF_REFRESH_TIME, 10);
+        this.interfaceRefresh = sharedPreferences.getInt(INTERFACE_REFRESH_TIME, 1);
+
+    }
+
+    public void saveData() {
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(PREFS_CHANGED, false);
+        editor.apply();
+    }
 
     //    Notifications
     private void createNotificationChannel() {
@@ -310,5 +367,6 @@ public class MainActivity extends AppCompatActivity {
             notificationManager.notify(notificationId, builder.build());
         }
     }
+
 
 }

@@ -13,11 +13,14 @@ public class RefreshTemperatureRunnableTask implements Runnable {
     volatile boolean stopThread;
     String currentTemperature = "0";
     GetThermometerValue thermometerValue;
+    int refreshTime;
 
-    public RefreshTemperatureRunnableTask(Handler backgroundHandler, String ipAddress) {
+    public RefreshTemperatureRunnableTask(Handler backgroundHandler, String ipAddress, int refreshTime) {
         this.backgroundHandler = backgroundHandler;
         this.stopThread = false;
+//        Log.d(TAG, ipAddress);
         this.thermometerValue = new GetThermometerValue(ipAddress);
+        this.refreshTime = refreshTime * 1000;
     }
 
     @Override
@@ -27,7 +30,7 @@ public class RefreshTemperatureRunnableTask implements Runnable {
             return;
         }
         backgroundTask();
-        backgroundHandler.postDelayed(this, 5000); // Repeat every 3 seconds
+        backgroundHandler.postDelayed(this, refreshTime); // Repeat every x seconds
     }
 
     public void backgroundTask() {
