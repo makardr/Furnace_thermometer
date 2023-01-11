@@ -27,7 +27,7 @@ public class RefreshTemperatureRunnableTask implements Runnable {
             return;
         }
         backgroundTask();
-        backgroundHandler.postDelayed(this, 3000); // Repeat every 3 seconds
+        backgroundHandler.postDelayed(this, 5000); // Repeat every 3 seconds
     }
 
     public void backgroundTask() {

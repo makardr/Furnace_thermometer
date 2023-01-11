@@ -3,7 +3,6 @@ package com.example.furnacethermometer;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -58,19 +57,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "Application created");
-
+        this.ipAddress = "http://192.168.0.120/";
 //        Create channel for non-alert notifications
         createNotificationChannel();
+//        Create channel for alert notifications
         createAlertNotificationChannel();
-//        Create channel for alert notifications?
-
 
 //        Initialize background handler
         backgroundHandler = createBackgroundHandler();
-
-//        Initialize runnable task
+//        Initialize background runnable tasks
         this.refreshTemperatureRunnableTask = new RefreshTemperatureRunnableTask(backgroundHandler, ipAddress);
-//        Log.i(TAG, "onCreate: current temperature is " + refreshTemperatureRunnableTask.getCurrentTemperature());
+
+
+
+
+
 
 //        Initialize interface components in code
         this.textViewDisplay = (TextView) findViewById(R.id.textViewDisplay);
@@ -84,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
                 startButton.setText("Stop");
             }
         }
-
     }
 
     //    Save current state of application in case it recreates
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "Application destroyed");
         refreshTemperatureRunnableTask.setStopThread();
         stopHandlerTasks();
-        createNotification("Температура", "Приложение завершило работу", 2222, ALERT_NOTIFICATION_CHANNEL_ID,1);
+        createNotification("Температура", "Приложение завершило работу", 2222, ALERT_NOTIFICATION_CHANNEL_ID, 2);
     }
 
 
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         tv.setText(text);
     }
 
-//    Interface buttons
+    //    Interface buttons
     public void startBtnAction(View view) {
         if (!taskStartedFlag) {
             try {
@@ -163,18 +163,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void settingsBtnAction(View view) {
-        taskStartedFlag = false;
-        startButton.setText("Start");
-        refreshTemperatureRunnableTask.setStopThread();
-        stopHandlerTasks();
+        try {
+            taskStartedFlag = false;
+            startButton.setText("Start");
+            refreshTemperatureRunnableTask.setStopThread();
+            stopHandlerTasks();
+        } catch (Exception e) {
+            Log.e(TAG, "settingsBtnAction: cant finish threads");
+        }
+
 
 //        Open settings activity
-        Intent intent = new Intent(this,SettingsActivity.class);
+        Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
 
 
 //    Handlers, background, technical stuff
+    public void initializeRunnableTasksUnused(){
+
+        //        Initialize background handler
+        backgroundHandler = createBackgroundHandler();
+        //        Initialize background runnable tasks
+        this.refreshTemperatureRunnableTask = new RefreshTemperatureRunnableTask(backgroundHandler, ipAddress);
+        this.interfaceUpdateTask = new UpdateInterfaceRunnable(textViewDisplay, mainHandler, refreshTemperatureRunnableTask);
+        this.notificationUpdateTask = new UpdateNotificationRunnable(mainHandler, refreshTemperatureRunnableTask, this);
+    }
+
 
     public void startHandlerTasks() throws InterruptedException {
 //        Start updating temperature value
@@ -184,9 +199,10 @@ public class MainActivity extends AppCompatActivity {
         mainHandler.post(interfaceUpdateTask);
 
 //        Start sending notifications
-//        this.notificationUpdateTask = notificationUpdateTaskBuilder();
         this.notificationUpdateTask = new UpdateNotificationRunnable(mainHandler, refreshTemperatureRunnableTask, this);
         mainHandler.post(notificationUpdateTask);
+
+
 
 
     }
@@ -226,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
         }
     }
+
     private void createAlertNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
@@ -242,8 +259,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void createNotification(String textTitle, String textContent, int notificationId,String NOTIFICATION_CHANNEL_ID,int priority) {
-        if (priority==2) {
+    public void createNotification(String textTitle, String textContent, int notificationId, String NOTIFICATION_CHANNEL_ID, int priority) {
+        if (priority == 2) {
             Uri alertSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -256,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
 // notificationId is a unique int for each notification that you must define
             notificationManager.notify(notificationId, builder.build());
-        }else {
+        } else {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_launcher_foreground)
                     .setContentTitle(textTitle)
@@ -270,8 +287,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static void staticCreateNotification(String textTitle, String textContent, int notificationId, String NOTIFICATION_CHANNEL_ID, MainActivity activity,int priority) {
-        if (priority==2) {
+    public static void staticCreateNotification(String textTitle, String textContent, int notificationId, String NOTIFICATION_CHANNEL_ID, MainActivity activity, int priority) {
+        if (priority == 2) {
             Uri alertSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(activity, NOTIFICATION_CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_launcher_foreground)

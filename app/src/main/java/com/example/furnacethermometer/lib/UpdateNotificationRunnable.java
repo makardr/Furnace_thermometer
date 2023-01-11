@@ -44,17 +44,18 @@ public class UpdateNotificationRunnable implements Runnable {
     }
 
     public void checkTemperatureForNotification(String temperature) {
-        int temperatureLimit=65;
-        int temperatureInt=Integer.parseInt(temperature);
-        if (temperatureInt >= temperatureLimit && !messageSend) {
-            messageSend = true;
-            Log.d(TAG, "Notification alert for temperature over 50 degrees should be sent once");
-            MainActivity.staticCreateNotification("Температура", "Температура печки больше " + temperatureLimit + " градусов", 2222, "alert_temperature_notification", mainActivity,2);
-        }
-        if (temperatureInt < temperatureLimit && messageSend) {
-            messageSend = false;
-            Log.d(TAG, "Flag is false, notification should not be sent");
+        int temperatureLimit = 65;
+        if (temperature != null) {
+            int temperatureInt = Integer.parseInt(temperature);
+            if (temperatureInt >= temperatureLimit && !messageSend) {
+                messageSend = true;
+                Log.d(TAG, "Notification alert for temperature over 50 degrees should be sent once");
+                MainActivity.staticCreateNotification("Температура", "Температура печки больше " + temperatureLimit + " градусов", 2222, "alert_temperature_notification", mainActivity, 2);
+            }
+            if (temperatureInt < temperatureLimit && messageSend) {
+                messageSend = false;
+                Log.d(TAG, "Flag is false");
+            }
         }
     }
-
 }

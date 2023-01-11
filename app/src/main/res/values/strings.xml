@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Furnace thermometer</string>
+    <string name="ip_address">Ip address</string>
+    <string name="temperature_limit">Limit</string>
+    <string name="none">None</string>
+    <string name="settings">Settings</string>
+    <string name="start">Start</string>
+    <string name="time_to_refresh_interface">Time to refresh interface</string>
+    <string name="russian">Русский</string>
+    <string name="english">English</string>
+    <string name="save_changes">Save changes</string>
+    <string name="time_to_refresh_temperature">Time to refresh temperature</string>
+    <string name="time_to_send_notification">Time to send notification</string>
 </resources>
