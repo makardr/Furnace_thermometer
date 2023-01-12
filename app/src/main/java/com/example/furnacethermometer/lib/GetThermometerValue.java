@@ -19,20 +19,16 @@ public class GetThermometerValue {
     }
 
     public String readStringHtml() {
-        if (Objects.equals(ipAddress, "")) {
-            String html;
-            try {
-                html = Jsoup.connect(this.ipAddress).get().html();
-                Document document = Jsoup.parse(html);
-                Element link = document.select("p").first();
+        String html;
+        try {
+            html = Jsoup.connect(this.ipAddress).get().html();
+            Document document = Jsoup.parse(html);
+            Element link = document.select("p").first();
 //            Log.i(TAG, "Thread: " + Thread.currentThread().getId() + " Result: " + Integer.parseInt(strNumber));
-                return link.text().split(" ")[0];
+            return link.text().split(" ")[0];
 
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage(), e);
-                return null;
-            }
-        } else {
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
             return null;
         }
 
