@@ -13,4 +13,5 @@
     <string name="save_changes">test</string>
     <string name="time_to_refresh_temperature">test</string>
     <string name="time_to_send_notification">test</string>
+    <string name="stop">test</string>
 </resources>

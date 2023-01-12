@@ -12,4 +12,5 @@
     <string name="save_changes">Save changes</string>
     <string name="time_to_refresh_temperature">Time to refresh temperature</string>
     <string name="time_to_send_notification">Time to send notification</string>
+    <string name="stop">Stop</string>
 </resources>

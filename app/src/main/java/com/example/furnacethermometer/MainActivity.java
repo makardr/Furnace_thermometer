@@ -139,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
         if (sharedPreferenceChanged) {
             Log.d(TAG, "onResume: Shared preference changed");
             saveData();
+            reinitializeRunnableTasks();
         }
         Log.d(TAG, "Application started");
     }
@@ -184,14 +185,14 @@ public class MainActivity extends AppCompatActivity {
                 refreshTemperatureRunnableTask.setStartThread();
                 startHandlerTasks();
                 taskStartedFlag = true;
-                startButton.setText("Stop");
+                startButton.setText(R.string.stop);
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         } else {
             taskStartedFlag = false;
-            startButton.setText("Start");
+            startButton.setText(R.string.start);
             refreshTemperatureRunnableTask.setStopThread();
             stopHandlerTasks();
         }
@@ -201,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
     public void settingsBtnAction(View view) {
         try {
             taskStartedFlag = false;
-            startButton.setText("Start");
+            startButton.setText(R.string.start);
             refreshTemperatureRunnableTask.setStopThread();
             stopHandlerTasks();
         } catch (Exception e) {
@@ -216,15 +217,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     //    Handlers, background, technical stuff
-//    public void initializeRunnableTasksUnused() {
-//
-//        //        Initialize background handler
-//        backgroundHandler = createBackgroundHandler();
-//        //        Initialize background runnable tasks
-//        this.refreshTemperatureRunnableTask = new RefreshTemperatureRunnableTask(backgroundHandler, ipAddress,refreshTime);
-//        this.interfaceUpdateTask = new UpdateInterfaceRunnable(textViewDisplay, mainHandler, refreshTemperatureRunnableTask);
-//        this.notificationUpdateTask = new UpdateNotificationRunnable(mainHandler, refreshTemperatureRunnableTask, this, tLimitOne, tLimitTwo);
-//    }
+    public void reinitializeRunnableTasks() {
+        //        Initialize background runnable tasks
+        this.refreshTemperatureRunnableTask = new RefreshTemperatureRunnableTask(this.backgroundHandler, this.ipAddress, this.refreshTime);
+        this.interfaceUpdateTask = new UpdateInterfaceRunnable(textViewDisplay, this.mainHandler, this.refreshTemperatureRunnableTask, this.interfaceRefresh);
+        this.notificationUpdateTask = new UpdateNotificationRunnable(this.mainHandler, this.refreshTemperatureRunnableTask, this, this.tLimitOne, this.tLimitTwo, this.notifTime);
+    }
 
 
     public void startHandlerTasks() throws InterruptedException {
@@ -237,8 +235,6 @@ public class MainActivity extends AppCompatActivity {
 //        Start sending notifications
         this.notificationUpdateTask = new UpdateNotificationRunnable(this.mainHandler, this.refreshTemperatureRunnableTask, this, this.tLimitOne, this.tLimitTwo, this.notifTime);
         this.mainHandler.post(this.notificationUpdateTask);
-
-
     }
 
     public void stopHandlerTasks() {
@@ -367,6 +363,4 @@ public class MainActivity extends AppCompatActivity {
             notificationManager.notify(notificationId, builder.build());
         }
     }
-
-
 }
