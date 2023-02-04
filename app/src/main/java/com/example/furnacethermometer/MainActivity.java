@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
     //    Save current state of application in case it recreates
 //    Recreating interface instance is currently unimportant, because upon recreation application lose background task,
-//    and this problem of zombie thread was resolved by simply eliminating thread in onDestroy, but saving current instance is pointless
+//    and this problem of zombie thread was resolved by simply eliminating thread in onDestroy and restricting user from changing screen orientation, but saving current instance is pointless
 //    until I figure out how to save thread in saved instance
     @Override
     public void onSaveInstanceState(Bundle savedState) {
@@ -186,15 +186,18 @@ public class MainActivity extends AppCompatActivity {
                 startHandlerTasks();
                 taskStartedFlag = true;
                 startButton.setText(R.string.stop);
-
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         } else {
-            taskStartedFlag = false;
-            startButton.setText(R.string.start);
-            refreshTemperatureRunnableTask.setStopThread();
-            stopHandlerTasks();
+            try {
+                refreshTemperatureRunnableTask.setStopThread();
+                stopHandlerTasks();
+                startButton.setText(R.string.start);
+                taskStartedFlag = false;
+            } catch (Exception e){
+                Log.e(TAG, "startBtnAction: " + e.getMessage());
+            }
         }
 
     }
@@ -238,8 +241,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void stopHandlerTasks() {
-        notificationUpdateTask.setStopThread();
-        interfaceUpdateTask.setStopThread();
+        try {
+            notificationUpdateTask.setStopThread();
+            interfaceUpdateTask.setStopThread();
+        } catch (Exception e) {
+            Log.e(TAG, "Could not stop threads normally " + e.getMessage());
+        }
     }
 
 
@@ -269,7 +276,6 @@ public class MainActivity extends AppCompatActivity {
         this.refreshTime = sharedPreferences.getInt(T_REFRESH_TIME, 5);
         this.notifTime = sharedPreferences.getInt(NOTIF_REFRESH_TIME, 10);
         this.interfaceRefresh = sharedPreferences.getInt(INTERFACE_REFRESH_TIME, 1);
-
     }
 
     public void saveData() {

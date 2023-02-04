@@ -62,7 +62,7 @@ public class UpdateNotificationRunnable implements Runnable {
             }
             if (temperatureInt < tLimitOne && firstAlertSend) {
                 firstAlertSend = false;
-                MainActivity.staticCreateNotification("Температура", "Температура печки падает меньше " + tLimitOne + " градусов", 2222, "alert_temperature_notification", mainActivity, 2);
+                MainActivity.staticCreateNotification("Температура", "Температура печки меньше " + tLimitOne + " градусов", 2222, "alert_temperature_notification", mainActivity, 2);
             }
         }
         if (temperature != null) {
@@ -73,7 +73,7 @@ public class UpdateNotificationRunnable implements Runnable {
             }
             if (temperatureInt < tLimitTwo && secondAlertSend) {
                 secondAlertSend = false;
-                MainActivity.staticCreateNotification("Температура", "Температура печки падает меньше " + tLimitTwo + " градусов", 2222, "alert_temperature_notification", mainActivity, 2);
+                MainActivity.staticCreateNotification("Температура", "Температура печки меньше " + tLimitTwo + " градусов", 2222, "alert_temperature_notification", mainActivity, 2);
             }
         }
     }

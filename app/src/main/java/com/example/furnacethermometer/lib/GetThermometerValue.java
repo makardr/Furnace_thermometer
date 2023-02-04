@@ -31,8 +31,5 @@ public class GetThermometerValue {
             Log.e(TAG, e.getMessage(), e);
             return null;
         }
-
     }
-
-
 }
