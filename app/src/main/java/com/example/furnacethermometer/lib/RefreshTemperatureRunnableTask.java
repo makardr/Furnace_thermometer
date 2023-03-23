@@ -3,6 +3,8 @@ package com.example.furnacethermometer.lib;
 import android.os.Handler;
 import android.util.Log;
 
+import com.example.furnacethermometer.MainActivity;
+
 
 //  This class is runnable that was separated into its own class to better separate all the background things connected to the
 //  background task into one place, and to allow better control of it

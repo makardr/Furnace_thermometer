@@ -2,6 +2,8 @@ package com.example.furnacethermometer.lib;
 
 import android.util.Log;
 
+import com.example.furnacethermometer.MainActivity;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -27,8 +29,8 @@ public class GetThermometerValue {
             Element link = document.select("p").first();
             try {
                 Log.i(TAG, "Test Result: " + link.text());
-            } catch (Exception e){
-                Log.i(TAG,e.toString());
+            } catch (Exception e) {
+                Log.i(TAG, e.toString());
             }
             return link.text().split(" ")[0];
         } catch (UnknownHostException hostException){

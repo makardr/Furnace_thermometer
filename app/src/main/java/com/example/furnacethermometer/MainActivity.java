@@ -1,12 +1,10 @@
 package com.example.furnacethermometer;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -21,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.example.furnacethermometer.lib.MyNotificationManager;
 import com.example.furnacethermometer.lib.RefreshTemperatureRunnableTask;
 import com.example.furnacethermometer.lib.UpdateInterfaceRunnable;
 import com.example.furnacethermometer.lib.UpdateNotificationRunnable;
@@ -52,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
     private int refreshTime;
     private int notifTime;
     private int interfaceRefresh;
+
+    //    Notifications
+    public MyNotificationManager myNotificationManager;
 
     //    Flags
     private boolean taskStartedFlag = false;
@@ -89,10 +91,13 @@ public class MainActivity extends AppCompatActivity {
 //        Language
         Log.d(TAG, "Current language is " + language);
 
+//        Initialize MyNotificationManager
+        this.myNotificationManager = new MyNotificationManager(this);
 //        Create channel for non-alert notifications
-        createNotificationChannel();
+        myNotificationManager.createNotificationChannel();
 //        Create channel for alert notifications
-        createAlertNotificationChannel();
+        myNotificationManager.createAlertNotificationChannel();
+
 
 
 //        Initialize background handler
@@ -169,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "Application destroyed");
         refreshTemperatureRunnableTask.setStopThread();
         stopHandlerTasks();
-        createNotification("Температура", "Приложение завершило работу", 2222, ALERT_NOTIFICATION_CHANNEL_ID, 2);
+        myNotificationManager.createNotification("Температура", "Приложение завершило работу", 2222, ALERT_NOTIFICATION_CHANNEL_ID, 2);
     }
 
 
@@ -224,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
         //        Initialize background runnable tasks
         this.refreshTemperatureRunnableTask = new RefreshTemperatureRunnableTask(this.backgroundHandler, this.ipAddress, this.refreshTime);
         this.interfaceUpdateTask = new UpdateInterfaceRunnable(textViewDisplay, this.mainHandler, this.refreshTemperatureRunnableTask, this.interfaceRefresh);
-        this.notificationUpdateTask = new UpdateNotificationRunnable(this.mainHandler, this.refreshTemperatureRunnableTask, this, this.tLimitOne, this.tLimitTwo, this.notifTime);
+        this.notificationUpdateTask = new UpdateNotificationRunnable(this.mainHandler, this.refreshTemperatureRunnableTask, myNotificationManager, this.tLimitOne, this.tLimitTwo, this.notifTime);
     }
 
 
@@ -236,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
         this.mainHandler.post(interfaceUpdateTask);
 
 //        Start sending notifications
-        this.notificationUpdateTask = new UpdateNotificationRunnable(this.mainHandler, this.refreshTemperatureRunnableTask, this, this.tLimitOne, this.tLimitTwo, this.notifTime);
+        this.notificationUpdateTask = new UpdateNotificationRunnable(this.mainHandler, this.refreshTemperatureRunnableTask, myNotificationManager, this.tLimitOne, this.tLimitTwo, this.notifTime);
         this.mainHandler.post(this.notificationUpdateTask);
     }
 
@@ -283,90 +288,5 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(PREFS_CHANGED, false);
         editor.apply();
-    }
-
-    //    Notifications
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Thermometer background";
-            String description = "Notifications for temperature in the furnace";
-            int importance = NotificationManager.IMPORTANCE_LOW;
-            NotificationChannel channel = new NotificationChannel(BACKGROUND_NOTIFICATION_CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    private void createAlertNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Thermometer alerts";
-            String description = "alerts for temperature in the furnace";
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel(ALERT_NOTIFICATION_CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    public void createNotification(String textTitle, String textContent, int notificationId, String NOTIFICATION_CHANNEL_ID, int priority) {
-        if (priority == 2) {
-            Uri alertSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_launcher_foreground)
-                    .setContentTitle(textTitle)
-                    .setContentText(textContent)
-                    .setSound(alertSound)
-                    .setPriority(priority);
-//                .setPriority(NotificationCompat.PRIORITY_LOW);
-
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-// notificationId is a unique int for each notification that you must define
-            notificationManager.notify(notificationId, builder.build());
-        } else {
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_launcher_foreground)
-                    .setContentTitle(textTitle)
-                    .setContentText(textContent)
-                    .setPriority(priority);
-//                .setPriority(NotificationCompat.PRIORITY_LOW);
-
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-// notificationId is a unique int for each notification that you must define
-            notificationManager.notify(notificationId, builder.build());
-        }
-    }
-
-    public static void staticCreateNotification(String textTitle, String textContent, int notificationId, String NOTIFICATION_CHANNEL_ID, MainActivity activity, int priority) {
-        if (priority == 2) {
-            Uri alertSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(activity, NOTIFICATION_CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_launcher_foreground)
-                    .setContentTitle(textTitle)
-                    .setContentText(textContent)
-                    .setSound(alertSound)
-                    .setPriority(priority);
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(activity);
-            // notificationId is a unique int for each notification that you must define
-            notificationManager.notify(notificationId, builder.build());
-        } else {
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(activity, NOTIFICATION_CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_launcher_foreground)
-                    .setContentTitle(textTitle)
-                    .setContentText(textContent)
-                    .setPriority(priority);
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(activity);
-            // notificationId is a unique int for each notification that you must define
-            notificationManager.notify(notificationId, builder.build());
-        }
     }
 }
