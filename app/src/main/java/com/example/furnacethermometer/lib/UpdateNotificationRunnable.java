@@ -76,5 +76,8 @@ public class UpdateNotificationRunnable implements Runnable {
                 MainActivity.staticCreateNotification("Температура", "Температура печки меньше " + tLimitTwo + " градусов", 2222, "alert_temperature_notification", mainActivity, 2);
             }
         }
+        if (temperature.equals("404")){
+            MainActivity.staticCreateNotification("Температура", "Приложению не удалось получить доступ к сети, UnknownHostException", 2224, "alert_temperature_notification", mainActivity, 2);
+        }
     }
 }
