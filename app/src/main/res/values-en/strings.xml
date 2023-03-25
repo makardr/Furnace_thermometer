@@ -14,4 +14,8 @@
     <string name="save_changes">Save changes</string>
     <string name="time_to_refresh_temperature">Time to refresh temperature</string>
     <string name="stop">Stop</string>
+    <string name="thermometer_silent_name">Silent notifications</string>
+    <string name="thermometer_silent_description">Silent notifications for temperature</string>
+    <string name="thermometer_alert_name">Temperature alerts</string>
+    <string name="thermometer_alert_description">Alerts for temperature limits in the furnace</string>
 </resources>

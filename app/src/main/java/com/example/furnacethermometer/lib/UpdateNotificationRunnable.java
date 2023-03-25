@@ -35,7 +35,7 @@ public class UpdateNotificationRunnable implements Runnable {
             Log.d(TAG, "Thread " + Thread.currentThread().getId() + " stopped");
             return;
         }
-        myNotificationManager.createNotification("Температура", "Температура печки " + temperatureRefreshClass.getCurrentTemperature() + " градусов", 1212, "temperature_notification", -1);
+        myNotificationManager.createNotification("Температура", "Температура печки " + temperatureRefreshClass.getCurrentTemperature() + " градусов", 1212, MainActivity.SILENT_NOTIFICATION_CHANNEL_ID, -1);
 
         Log.i(TAG, "notificationUpdateTask: Notification sent");
         checkTemperatureForNotification(temperatureRefreshClass.getCurrentTemperature());
@@ -58,27 +58,27 @@ public class UpdateNotificationRunnable implements Runnable {
             if (temperatureInt >= tLimitOne && !firstAlertSend) {
                 firstAlertSend = true;
                 Log.d(TAG, "Notification alert for temperature over 55 degrees should be sent once");
-                myNotificationManager.createNotification("Температура", "Температура печки больше " + tLimitOne + " градусов", 2222, "alert_temperature_notification", 2);
+                myNotificationManager.createNotification("Температура", "Температура печки больше " + tLimitOne + " градусов", 2222, MainActivity.ALERT_NOTIFICATION_CHANNEL_ID, 2);
             }
             if (temperatureInt < tLimitOne && firstAlertSend) {
                 firstAlertSend = false;
-                myNotificationManager.createNotification("Температура", "Температура печки меньше " + tLimitOne + " градусов", 2222, "alert_temperature_notification", 2);
+                myNotificationManager.createNotification("Температура", "Температура печки меньше " + tLimitOne + " градусов", 2222, MainActivity.ALERT_NOTIFICATION_CHANNEL_ID, 2);
             }
         }
         if (temperature != null) {
             int temperatureInt = Integer.parseInt(temperature);
             if (temperatureInt >= tLimitTwo && !secondAlertSend) {
                 secondAlertSend = true;
-                myNotificationManager.createNotification("Температура", "Температура печки больше " + tLimitTwo + " градусов", 2222, "alert_temperature_notification", 2);
+                myNotificationManager.createNotification("Температура", "Температура печки больше " + tLimitTwo + " градусов", 2222, MainActivity.ALERT_NOTIFICATION_CHANNEL_ID, 2);
             }
             if (temperatureInt < tLimitTwo && secondAlertSend) {
                 secondAlertSend = false;
-                myNotificationManager.createNotification("Температура", "Температура печки меньше " + tLimitTwo + " градусов", 2222, "alert_temperature_notification", 2);
+                myNotificationManager.createNotification("Температура", "Температура печки меньше " + tLimitTwo + " градусов", 2222, MainActivity.ALERT_NOTIFICATION_CHANNEL_ID, 2);
             }
         }
         if (temperature != null) {
             if (temperature.equals("404")) {
-                myNotificationManager.createNotification("Температура", "Приложению не удалось получить доступ к сети, UnknownHostException", 2224, "alert_temperature_notification", 2);
+                myNotificationManager.createNotification("Температура", "Приложению не удалось получить доступ к сети, UnknownHostException", 2224, MainActivity.ALERT_NOTIFICATION_CHANNEL_ID, 2);
             }
         }
     }

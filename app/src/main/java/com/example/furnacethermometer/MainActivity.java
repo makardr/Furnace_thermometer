@@ -1,10 +1,9 @@
 package com.example.furnacethermometer;
 
 
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -16,8 +15,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 import com.example.furnacethermometer.lib.MyNotificationManager;
 import com.example.furnacethermometer.lib.RefreshTemperatureRunnableTask;
@@ -29,8 +26,10 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "ThermometerMainActivity";
-    private static final String BACKGROUND_NOTIFICATION_CHANNEL_ID = "temperature_notification";
-    private static final String ALERT_NOTIFICATION_CHANNEL_ID = "alert_temperature_notification";
+
+    public static final String SILENT_NOTIFICATION_CHANNEL_ID = "silent_temperature_notification";
+    public static final String ALERT_NOTIFICATION_CHANNEL_ID = "alert_temperature_notification";
+
 
     //    Shared preferences finals
     public static final String SHARED_PREFS = "shared_prefs";
@@ -91,12 +90,13 @@ public class MainActivity extends AppCompatActivity {
 //        Language
         Log.d(TAG, "Current language is " + language);
 
+//        Notifications
 //        Initialize MyNotificationManager
         this.myNotificationManager = new MyNotificationManager(this);
 //        Create channel for non-alert notifications
-        myNotificationManager.createNotificationChannel();
+        myNotificationManager.createNotificationChannel(getString(R.string.thermometer_silent_name),getString(R.string.thermometer_silent_description), NotificationManager.IMPORTANCE_LOW,SILENT_NOTIFICATION_CHANNEL_ID);
 //        Create channel for alert notifications
-        myNotificationManager.createAlertNotificationChannel();
+        myNotificationManager.createNotificationChannel(getString(R.string.thermometer_alert_name),getString(R.string.thermometer_alert_description),NotificationManager.IMPORTANCE_HIGH,ALERT_NOTIFICATION_CHANNEL_ID);
 
 
 

@@ -14,4 +14,8 @@
     <string name="time_to_refresh_temperature">Время обновления температуры</string>
     <string name="time_to_send_notification">Время отправки уведомления</string>
     <string name="stop">Стоп</string>
+    <string name="thermometer_silent_name">Тихие уведомления</string>
+    <string name="thermometer_silent_description">Тихие уведомления для температуры в печи</string>
+    <string name="thermometer_alert_name">Предупреждения об температуре</string>
+    <string name="thermometer_alert_description">Предупреждения об превышении установленных температурных порогов</string>
 </resources>

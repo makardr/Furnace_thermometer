@@ -14,24 +14,19 @@ import com.example.furnacethermometer.R;
 
 public class MyNotificationManager {
     private static final String TAG = "MyNotificationManager";
-    private static final String BACKGROUND_NOTIFICATION_CHANNEL_ID = "temperature_notification";
-    private static final String ALERT_NOTIFICATION_CHANNEL_ID = "alert_temperature_notification";
 
-//    Main activity is an application context
+    //    Main activity is an application context
     MainActivity mainActivity;
 
     public MyNotificationManager(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
     }
 
-    public void createNotificationChannel() {
+    public void createNotificationChannel(String name, String description, int importance, String notification_channel_id) {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Thermometer background";
-            String description = "Notifications for temperature in the furnace";
-            int importance = NotificationManager.IMPORTANCE_LOW;
-            NotificationChannel channel = new NotificationChannel(BACKGROUND_NOTIFICATION_CHANNEL_ID, name, importance);
+            NotificationChannel channel = new NotificationChannel(notification_channel_id, name, importance);
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
@@ -40,21 +35,6 @@ public class MyNotificationManager {
         }
     }
 
-    public void createAlertNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Thermometer alerts";
-            String description = "alerts for temperature in the furnace";
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel(ALERT_NOTIFICATION_CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = mainActivity.getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
     public void createNotification(String textTitle, String textContent, int notificationId, String NOTIFICATION_CHANNEL_ID, int priority) {
         if (priority == 2) {
             Uri alertSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
