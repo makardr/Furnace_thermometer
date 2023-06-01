@@ -14,7 +14,7 @@
     <string name="time_to_send_notification">Time to send notification</string>
     <string name="stop">Stop</string>
     <string name="thermometer_silent_name">Thermometer background</string>
-    <string name="thermometer_silent_description">Thermometer background</string>
+    <string name="thermometer_silent_description">Thermometer background description</string>
     <string name="thermometer_alert_name">Thermometer alerts</string>
     <string name="thermometer_alert_description">Alerts for temperature in the furnace</string>
 </resources>

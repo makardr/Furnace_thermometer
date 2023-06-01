@@ -20,62 +20,62 @@ public class myApp extends Application {
         super.onCreate();
 
         Log.d(TAG, "Application created");
-        // Required initialization logic here!
-        if (isExternalStorageWritable()) {
-
-            File appDirectory = new File(Environment.getExternalStorageDirectory() + "/MyPersonalAppFolder");
-            File logDirectory = new File(appDirectory + "/logs");
-            File logFile = new File(logDirectory, "logcat_" + System.currentTimeMillis() + ".txt");
-            Log.d(TAG, appDirectory.toString());
-
-            // create app folder
-            if (!appDirectory.exists()) {
-                appDirectory.mkdir();
-                Log.d(TAG, "App folder created");
-            }
-
-            // create log folder
-            if (!logDirectory.exists()) {
-                logDirectory.mkdir();
-                Log.d(TAG, "App log folder created");
-            }
-
-            // clear the previous logcat and then write the new one to the file
-            try {
-                Process process = Runtime.getRuntime().exec("logcat -c");
-                process = Runtime.getRuntime().exec("logcat -f " + logFile);
-//                process = Runtime.getRuntime().exec( "logcat -f " + logFile + " *:S MyActivity:D MyActivity2:D");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        } else if (isExternalStorageReadable()) {
-            // only readable
-            Log.d(TAG, "isExternalStorageReadable only readable");
-        } else {
-            // not accessible
-            Log.d(TAG, "isExternalStorageReadable not accessible");
-        }
+//        // Required initialization logic here!
+//        if (isExternalStorageWritable()) {
+//
+//            File appDirectory = new File(Environment.getExternalStorageDirectory() + "/MyPersonalAppFolder");
+//            File logDirectory = new File(appDirectory + "/logs");
+//            File logFile = new File(logDirectory, "logcat_" + System.currentTimeMillis() + ".txt");
+//            Log.d(TAG, appDirectory.toString());
+//
+//            // create app folder
+//            if (!appDirectory.exists()) {
+//                appDirectory.mkdir();
+//                Log.d(TAG, "App folder created");
+//            }
+//
+//            // create log folder
+//            if (!logDirectory.exists()) {
+//                logDirectory.mkdir();
+//                Log.d(TAG, "App log folder created");
+//            }
+//
+//            // clear the previous logcat and then write the new one to the file
+//            try {
+//                Process process = Runtime.getRuntime().exec("logcat -c");
+//                process = Runtime.getRuntime().exec("logcat -f " + logFile);
+////                process = Runtime.getRuntime().exec( "logcat -f " + logFile + " *:S MyActivity:D MyActivity2:D");
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//        } else if (isExternalStorageReadable()) {
+//            // only readable
+//            Log.d(TAG, "isExternalStorageReadable only readable");
+//        } else {
+//            // not accessible
+//            Log.d(TAG, "isExternalStorageReadable not accessible");
+//        }
     }
 
     /* Checks if external storage is available for read and write */
-    public boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
-    }
+//    public boolean isExternalStorageWritable() {
+//        String state = Environment.getExternalStorageState();
+//        if (Environment.MEDIA_MOUNTED.equals(state)) {
+//            return true;
+//        }
+//        return false;
+//    }
 
     /* Checks if external storage is available to at least read */
-    public boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
-    }
+//    public boolean isExternalStorageReadable() {
+//        String state = Environment.getExternalStorageState();
+//        if (Environment.MEDIA_MOUNTED.equals(state) ||
+//                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+//            return true;
+//        }
+//        return false;
+//    }
 
     // Called by the system when the device configuration changes while your component is running.
     // Overriding this method is totally optional!

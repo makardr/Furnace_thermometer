@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.furnacethermometer.lib.MyAppPreferences;
 import com.example.furnacethermometer.lib.MyNotificationManager;
 import com.example.furnacethermometer.lib.RefreshTemperatureRunnableTask;
 import com.example.furnacethermometer.lib.UpdateInterfaceRunnable;
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "Application created");
 //        SharedPreferences
         loadData();
+//        MyAppPreferences.getInstance().TEST;
 
 //        Language
         Log.d(TAG, "Current language is " + language);
@@ -94,10 +96,9 @@ public class MainActivity extends AppCompatActivity {
 //        Initialize MyNotificationManager
         this.myNotificationManager = new MyNotificationManager(this);
 //        Create channel for non-alert notifications
-        myNotificationManager.createNotificationChannel(getString(R.string.thermometer_silent_name),getString(R.string.thermometer_silent_description), NotificationManager.IMPORTANCE_LOW,SILENT_NOTIFICATION_CHANNEL_ID);
+        myNotificationManager.createNotificationChannel(getString(R.string.thermometer_silent_name), getString(R.string.thermometer_silent_description), NotificationManager.IMPORTANCE_LOW, SILENT_NOTIFICATION_CHANNEL_ID);
 //        Create channel for alert notifications
-        myNotificationManager.createNotificationChannel(getString(R.string.thermometer_alert_name),getString(R.string.thermometer_alert_description),NotificationManager.IMPORTANCE_HIGH,ALERT_NOTIFICATION_CHANNEL_ID);
-
+        myNotificationManager.createNotificationChannel(getString(R.string.thermometer_alert_name), getString(R.string.thermometer_alert_description), NotificationManager.IMPORTANCE_HIGH, ALERT_NOTIFICATION_CHANNEL_ID);
 
 
 //        Initialize background handler
@@ -200,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                 stopHandlerTasks();
                 startButton.setText(R.string.start);
                 taskStartedFlag = false;
-            } catch (Exception e){
+            } catch (Exception e) {
                 Log.e(TAG, "startBtnAction: " + e.getMessage());
             }
         }
